@@ -1,0 +1,45 @@
+* Grammar
+Reverse polish notation is used
+#+BEGIN_SRC
+lang -> stmt *
+stmt -> arith_stmt
+arith_stmt -> IDENT ASSIGN arith_expr SEMICOLON | PRINT arith_expr SEMICOLON
+
+arith_expr -> NUM | IDENT | arith_expr arith_expr arith_op
+arith_op -> ADD | SUB | MUL | DIV | MOD
+
+compar_expr -> arith_expr arith_expr compar_op
+compar_op -> GR | GE | EQ | LE | LS
+
+bool_expr -> compar_expr | bool_expr bool_expr bool_bin_op | bool_expr bool_un_op
+bool_bin_op -> AND | OR
+bool_un_op -> NOT
+
+while -> WHILE bool_expr L_CB while_body R_CB
+while_body -> lang
+
+WHILE -> while
+L_CB -> {
+R_CB -> }
+ASSIGN -> =
+
+ADD -> +
+SUB -> -
+MUL -> *
+MOD -> %
+
+AND -> &&
+OR -> ||
+NOT -> !
+
+GR -> >
+GE -> >=
+EQ -> ==
+LE -> <=
+LS -> <
+
+SEMICOLON -> ;
+PRINT -> print
+IDENT -> ^[A-Za-z]+[A-Za-z0-9]*$
+NUM -> ^0|([1-9][0-9]*)$
+#+END_SRC
