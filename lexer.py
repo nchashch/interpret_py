@@ -8,21 +8,28 @@ class Lexer:
 
     def next_token(self, text):
         acc = []
+        terms_c0 = list()
+        terms_c1 = list()
+        c1 = ''
         for i, c0 in enumerate(text[:-1]):
             acc.append(c0)
             acc_str = ''.join(acc)
-            terms_c0 = set()
-            terms_c1 = set()
             c1 = text[i+1]
+            terms_c0.clear()
+            terms_c1.clear()
             for t in self._terminals:
                 terminal = self._terminals[t]
                 match0 = re.match(terminal, acc_str)
                 match1 = re.match(terminal, acc_str + c1)
                 if match0:
-                    terms_c0.add(t)
+                    terms_c0.append(t)
                 if match1:
-                    terms_c1.add(t)
-            if len(terms_c0) == 1 and len(terms_c1) == 0:
+                    terms_c1.append(t)
+            if len(terms_c0) != 0 and len(terms_c1) == 0:
+                return terms_c0.pop(), acc_str
+        if len(terms_c1) != 0:
+                return terms_c1.pop(), acc_str + c1
+        elif len(terms_c0) != 0:
                 return terms_c0.pop(), acc_str
         return '', ''
 
@@ -44,12 +51,6 @@ if __name__ == '__main__':
         'DIV': '^\/$',
         'MOD': '^\%$',
 
-        # 'GR': '^\>$',
-        # 'GE': '^\>\=$',
-        # 'EQ': '^=(=|$)$',
-        # 'LS': '^\<$',
-        # 'LE': '^\<\=$',
-
         'LT': '^<$',
         'GT': '^>$',
         'LE': '^<=$',
@@ -62,11 +63,11 @@ if __name__ == '__main__':
         'OR': '^\|\|$',
         'NOT': '^!$',
 
+        'IDENT': '^[a-zA-Z]+[a-zA-Z0-9]*$',
         'NUM': '^0|([1-9][0-9]{0,})$',
         'PRINT_KW': '^print$',
         'WHILE_KW': '^while$',
         'IF_KW': '^if$',
-        'IDENT': '^[A-Z]+[A-Z0-9]*$',
     }
     # var reg = /^(o|$)(n|$)(e|$)(\s|$)$/;
 
@@ -77,11 +78,11 @@ if __name__ == '__main__':
         print A;
     }
 
-    while CAT <= 1 && CAT >= 0 {
+    while cat <= 1 && cat >= 0 {
         A = 1;
-        CAT = CAT A +;
+        cat = cat A +;
         print A;
-        print CAT;
+        print cat;
     }
     '''
     print(text + '\n')
