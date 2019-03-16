@@ -32,6 +32,12 @@ if __name__ == '__main__':
     tokens = lex.tokenize(text)
     rpn_tokens = shunting_yard(tokens)
     accs = [acc for _, acc in rpn_tokens]
-    print(' '.join(accs))
     result = rpn_eval(rpn_tokens)
-    print(result)
+    print('Input:', text)
+    print('RPN:', ' '.join(accs))
+    print()
+    print('Result:', result)
+    print()
+    print('RPN tokens:')
+    for t in rpn_tokens:
+        print(t)
