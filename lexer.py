@@ -8,21 +8,22 @@ class Lexer:
 
     def next_token(self, text):
         acc = []
-        for i, c0 in enumerate(text):
+        for i, c0 in enumerate(text[:-1]):
             acc.append(c0)
+            acc_str = ''.join(acc)
+            terms_c0 = set()
+            terms_c1 = set()
+            c1 = text[i+1]
             for t in self._terminals:
                 terminal = self._terminals[t]
-                acc_str = ''.join(acc)
-                if re.match(terminal, acc_str):
-                    for c1 in text[i+1:]:
-                        acc_str = ''.join(acc)
-                        if re.match(terminal, acc_str + c1):
-                            acc.append(c1)
-                            acc_str = ''.join(acc)
-                        else:
-                            return t, acc_str
-                    if re.match(terminal, acc_str):
-                        return t, acc_str
+                match0 = re.match(terminal, acc_str)
+                match1 = re.match(terminal, acc_str + c1)
+                if match0:
+                    terms_c0.add(t)
+                if match1:
+                    terms_c1.add(t)
+            if len(terms_c0) == 1 and len(terms_c1) == 0:
+                return terms_c0.pop(), acc_str
         return '', ''
 
     def tokenize(self, text):
@@ -57,6 +58,10 @@ if __name__ == '__main__':
         'NEQ': '^!=$',
         'ASSIGN': '^=$',
 
+        'AND': '^&&$',
+        'OR': '^\|\|$',
+        'NOT': '^!$',
+
         'NUM': '^0|([1-9][0-9]{0,})$',
         'PRINT_KW': '^print$',
         'WHILE_KW': '^while$',
@@ -67,12 +72,12 @@ if __name__ == '__main__':
 
     lex = Lexer(terminals)
     text = '''
-    if 1 == 1 {
+    if 1 == 1 || 1 >= 10 {
         A = 1 2 3 4 + +;
         print A;
     }
 
-    while CAT < 1 {
+    while CAT <= 1 && CAT >= 0 {
         A = 1;
         CAT = CAT A +;
         print A;
