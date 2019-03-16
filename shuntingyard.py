@@ -53,11 +53,6 @@ def shunting_yard(tokens):
     return output
 
 if __name__ == '__main__':
-    tokens = [
-        ('NUM', '12'),
-        ('ADD', '+'),
-        ('NUM', '10'),
-    ]
     lex = Lexer(terminals)
     text = '''
     ((1 + 2) / (cat - dog)) * 10 / 7 + 1 + 2 + 3
