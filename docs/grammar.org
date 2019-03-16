@@ -34,6 +34,7 @@ MOD -> %
 
 AND -> &&
 OR -> ||
+XOR -> ^^
 NOT -> !
 
 GR -> >
@@ -45,5 +46,5 @@ LS -> <
 SEMICOLON -> ;
 PRINT -> print
 IDENT -> ^[A-Za-z]+[A-Za-z0-9]*$
-NUM -> ^0|([1-9][0-9]*)$
+NUM -> ^0$|^([1-9][0-9]*)$
 #+END_SRC
