@@ -8,6 +8,7 @@ class Lexer:
         assert type(terminals) == OrderedDict
         self._terminals = terminals
 
+    # TODO: Explain how this works in comments
     def next_token(self, text):
         acc = []
         terms_c0 = list()

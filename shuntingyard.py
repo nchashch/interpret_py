@@ -1,9 +1,12 @@
 from lexer import Lexer
 from terminals import terminals
 
+# TODO(Optional): Make this exception more informative
+# TODO(Optional): Add exceptions for other failure modes
 class MismatchedParens:
     pass
 
+# TODO: Explain how this works in comments
 def shunting_yard(tokens):
     output = []
     op_stack = []
