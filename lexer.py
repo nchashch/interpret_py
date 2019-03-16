@@ -1,3 +1,4 @@
+#!/bin/python
 import re
 
 class Lexer:
@@ -36,13 +37,48 @@ class Lexer:
 
 if __name__ == '__main__':
     terminals = {
-        'abcd': '^abcd$',
-        'ABCD': '^ABCD$',
+        'ADD': '^\+$',
+        'SUB': '^\-$',
+        'MUL': '^\*$',
+        'DIV': '^\/$',
+        'MOD': '^\%$',
+
+        # 'GR': '^\>$',
+        # 'GE': '^\>\=$',
+        # 'EQ': '^=(=|$)$',
+        # 'LS': '^\<$',
+        # 'LE': '^\<\=$',
+
+        'LT': '^<$',
+        'GT': '^>$',
+        'LE': '^<=$',
+        'GE': '^>=$',
+        'EQ': '^==$',
+        'NEQ': '^!=$',
+        'ASSIGN': '^=$',
+
         'NUM': '^0|([1-9][0-9]{0,})$',
-        'DIGIT': '^[0-9]$',
+        'PRINT_KW': '^print$',
+        'WHILE_KW': '^while$',
+        'IF_KW': '^if$',
+        'IDENT': '^[A-Z]+[A-Z0-9]*$',
     }
+    # var reg = /^(o|$)(n|$)(e|$)(\s|$)$/;
+
     lex = Lexer(terminals)
-    text = '1234 abcd abcd, ABCD, abcd, 1 23 2442'
+    text = '''
+    if 1 == 1 {
+        A = 1 2 3 4 + +;
+        print A;
+    }
+
+    while CAT < 1 {
+        A = 1;
+        CAT = CAT A +;
+        print A;
+        print CAT;
+    }
+    '''
     print(text + '\n')
     for token in lex.tokenize(text):
         print(token)

@@ -2,7 +2,7 @@
 Reverse polish notation is used
 #+BEGIN_SRC
 lang -> stmt *
-stmt -> arith_stmt
+stmt -> arith_stmt | while
 arith_stmt -> IDENT ASSIGN arith_expr SEMICOLON | PRINT arith_expr SEMICOLON
 
 arith_expr -> NUM | IDENT | arith_expr arith_expr arith_op
@@ -18,6 +18,10 @@ bool_un_op -> NOT
 while -> WHILE bool_expr L_CB while_body R_CB
 while_body -> lang
 
+if -> IF bool_expr L_CB if_body R_CB
+if_body -> lang
+
+IF -> if
 WHILE -> while
 L_CB -> {
 R_CB -> }
