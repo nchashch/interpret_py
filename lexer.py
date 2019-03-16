@@ -1,9 +1,10 @@
 #!/bin/python
+from collections import OrderedDict
 import re
 
 class Lexer:
     def __init__(self, terminals):
-        assert type(terminals) == dict
+        assert type(terminals) == OrderedDict
         self._terminals = terminals
 
     def next_token(self, text):
@@ -12,12 +13,15 @@ class Lexer:
         terms_c1 = list()
         c1 = ''
         for i, c0 in enumerate(text[:-1]):
-            acc.append(c0)
+            if c0 != '\n':
+                acc.append(c0)
             acc_str = ''.join(acc)
             c1 = text[i+1]
             terms_c0.clear()
             terms_c1.clear()
-            for t in self._terminals:
+            # reversed in order to make terminals
+            # further up have higher priority
+            for t in reversed(self._terminals):
                 terminal = self._terminals[t]
                 match0 = re.match(terminal, acc_str)
                 match1 = re.match(terminal, acc_str + c1)
@@ -44,43 +48,47 @@ class Lexer:
             yield token
 
 if __name__ == '__main__':
-    terminals = {
-        'ADD': '^\+$',
-        'SUB': '^\-$',
-        'MUL': '^\*$',
-        'DIV': '^\/$',
-        'MOD': '^\%$',
+    terminals = OrderedDict([
+        ('ADD', '^\+$'),
+        ('SUB', '^\-$'),
+        ('MUL', '^\*$'),
+        ('DIV', '^\/$'),
+        ('MOD', '^\%$'),
 
-        'LT': '^<$',
-        'GT': '^>$',
-        'LE': '^<=$',
-        'GE': '^>=$',
-        'EQ': '^==$',
-        'NEQ': '^!=$',
-        'ASSIGN': '^=$',
+        ('LT', '^<$'),
+        ('GT', '^>$'),
+        ('LE', '^<=$'),
+        ('GE', '^>=$'),
+        ('EQ', '^==$'),
+        ('NEQ', '^!=$'),
+        ('ASSIGN', '^=$'),
 
-        'AND': '^&&$',
-        'OR': '^\|\|$',
-        'NOT': '^!$',
+        ('AND', '^&&$'),
+        ('OR', '^\|\|$'),
+        ('NOT', '^!$'),
 
-        'IDENT': '^[a-zA-Z]+[a-zA-Z0-9]*$',
-        'NUM': '^0|([1-9][0-9]{0,})$',
-        'PRINT_KW': '^print$',
-        'WHILE_KW': '^while$',
-        'IF_KW': '^if$',
-    }
+        ('L_CB', '^{$'),
+        ('R_CB', '^}$'),
+
+        ('PRINT_KW', '^print$'),
+        ('WHILE_KW', '^while$'),
+        ('IF_KW', '^if$'),
+        ('NUM', '^0$|^([1-9][0-9]{0,})$'),
+        ('IDENT', '^[a-zA-Z]+[a-zA-Z0-9]*$'),
+    ])
     # var reg = /^(o|$)(n|$)(e|$)(\s|$)$/;
 
     lex = Lexer(terminals)
-    text = '''
-    if 1 == 1 || 1 >= 10 {
-        A = 1 2 3 4 + +;
-        print A;
-    }
 
-    while cat <= 1 && cat >= 0 {
+    # if 1 == 1 || 1 >= 10 {
+    #     A = 1 + 2;
+    #     print A;
+    # }
+
+    text = '''
+    while cat <= 10 && cat >= 0 {
         A = 1;
-        cat = cat A +;
+        cat = cat + A;
         print A;
         print cat;
     }
