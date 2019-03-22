@@ -2,24 +2,30 @@
 Reverse polish notation is used
 #+BEGIN_SRC
 lang -> stmt *
-stmt -> arith_stmt | while
-arith_stmt -> IDENT ASSIGN arith_expr SEMICOLON | PRINT arith_expr SEMICOLON
+stmt -> bool_stmt | arith_stmt | func_stmt | while
+arith_stmt -> IDENT ASSIGN arith_expr SEMICOLON
+bool_stmt -> IDENT ASSIGN bool_expr SEMICOLON
+func_stmt -> func L_B func_args R_B SEMICOLON
+func_args = arith_expr | bool_expr
+func = PRINT
 
-arith_expr -> NUM | IDENT | arith_expr arith_expr arith_op
+expr -> arith_expr | bool_expr
+
+arith_expr -> NUM | IDENT | arith_expr arith_op arith_expr
 arith_op -> ADD | SUB | MUL | DIV | MOD
 
 compar_expr -> arith_expr arith_expr compar_op
 compar_op -> GR | GE | EQ | LE | LS
 
-bool_expr -> compar_expr | bool_expr bool_expr bool_bin_op | bool_expr bool_un_op
+bool_expr -> compar_expr | bool_expr bool_bin_op bool_expr | bool_un_op bool_expr
 bool_bin_op -> AND | OR
 bool_un_op -> NOT
 
 while -> WHILE bool_expr L_CB while_body R_CB
 while_body -> lang
 
-if -> IF bool_expr L_CB if_body R_CB
-if_body -> lang
+if -> IF bool_expr L_CB if_body L_CB
+if_body -> lang R_CB
 
 IF -> if
 WHILE -> while
