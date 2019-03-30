@@ -55,14 +55,13 @@ if __name__ == '__main__':
     text = '''
     if 1 == 1 || 1 >= 10 {
         A = (1 + 2);
-        print A;
+        print(A);
     }
 
     while cat <= 10 && cat >= 0 {
         A = 1;
         cat = cat + A;
-        print A;
-        print cat;
+        print(cat);
     }
     '''
     print(text + '\n')

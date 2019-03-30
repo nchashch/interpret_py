@@ -18,7 +18,7 @@ class Parser:
                 ast += stmt_ast
                 rest = stmt_rest
             else:
-                return [], tokens
+                return ast, rest
         return ast, rest
     # stmt -> bool_stmt | arith_stmt | func_stmt | while
     def _stmt(self, tokens):
@@ -122,11 +122,11 @@ class Parser:
     def _while(self, tokens):
         ast = []
         rest = tokens
-        while_ast, while_rest = self._terminal('WHILE', rest)
+        while_ast, while_rest = self._terminal('WHILE_KW', rest)
         if while_ast:
             ast += while_ast
             rest = while_rest
-            bool_ast, bool_rest = self._bool_expr(self, rest)
+            bool_ast, bool_rest = self._bool_expr(rest)
             if bool_ast:
                 ast += bool_ast
                 rest = bool_rest
@@ -143,25 +143,58 @@ class Parser:
                             ast += rcb_ast
                             rest = rcb_rest
                             return ast, rest
-            return [], tokens
-    def _bool_expr(self, tokens):
         return [], tokens
+    def _while_body(self, tokens):
+        return self._lang(tokens)
+    # compar_expr -> arith_expr compar_op arith_expr
     def _compar_expr(self, tokens):
-        pass
+        ast = []
+        rest = tokens
+        l_operand_ast, l_operand_rest = self._arith_expr(rest)
+        rest = l_operand_rest
+        if l_operand_ast:
+            ast += l_operand_ast
+            op_ast, op_rest = self._compar_op(rest)
+            if op_ast:
+                ast += op_ast
+                rest = op_rest
+                r_operand_ast, r_operand_rest = self._arith_expr(rest)
+                if r_operand_ast:
+                    ast += r_operand_ast
+                    rest = r_operand_rest
+                    return ast, rest
+        return [], tokens
+    # compar_op -> GT | GE | EQ | LE | LT
+    def _compar_op(self, tokens):
+        ast = []
+        rest = tokens
+        terminals = ['GT', 'GE', 'EQ', 'LE', 'LT']
+        for t in terminals:
+            term_ast, term_rest = self._terminal(t, rest)
+            if term_ast:
+                return term_ast, term_rest
+        return None, rest
+    def _bool_expr(self, tokens):
+        return self._compar_expr(tokens)
     def _bool_bin_op(self, tokens):
         pass
     def _bool_un_op(self, tokens):
         pass
-    def _while_body(self, tokens):
-        return self._lang(tokens)
 
 if __name__ == '__main__':
     lex = Lexer(terminals)
     text = '''
-    cat = 10 + 15 - 15;
-    dog = 2 % 1 + 16;
-    foo = cat / dog;
-    bar = foo % 10 + dog;
+    a = 0;
+    while a < 10 {
+        a = a + 1;
+    }
+    b = 10;
+    while b < 10 {
+        b = b + 1;
+        while 1 > 10 {
+            c = 10;
+        }
+    }
     '''
     print(text + '\n')
     tokens = lex.tokenize(text)

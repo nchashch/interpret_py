@@ -27,7 +27,7 @@ def rpn_eval(rpn_tokens):
 if __name__ == '__main__':
     lex = Lexer(terminals)
     text = '''
-    (100 + 14) / 2
+    (100 + 14) / 2 + 10
     '''
     tokens = lex.tokenize(text)
     rpn_tokens = shunting_yard(tokens)

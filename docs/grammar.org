@@ -1,5 +1,4 @@
 * Grammar
-Reverse polish notation is used
 #+BEGIN_SRC
 lang -> stmt *
 stmt -> bool_stmt | arith_stmt | func_stmt | while
@@ -15,7 +14,7 @@ arith_expr -> NUM | IDENT | arith_expr arith_op arith_expr
 arith_op -> ADD | SUB | MUL | DIV | MOD
 
 compar_expr -> arith_expr arith_expr compar_op
-compar_op -> GR | GE | EQ | LE | LS
+compar_op -> GT | GE | EQ | LE | LT
 
 bool_expr -> compar_expr | bool_expr bool_bin_op bool_expr | bool_un_op bool_expr
 bool_bin_op -> AND | OR
