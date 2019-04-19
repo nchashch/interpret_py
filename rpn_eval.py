@@ -2,7 +2,7 @@ from lexer import Lexer
 from shuntingyard import shunting_yard
 from terminals import terminals
 
-def rpn_eval(rpn_tokens):
+def rpn_eval(rpn_tokens, variables):
     vals = ('NUM', 'IDENT')
     ops = ('ADD', 'SUB', 'MUL', 'DIV', 'MOD')
     stack = []
@@ -10,6 +10,8 @@ def rpn_eval(rpn_tokens):
         t = terminal
         if t == 'NUM':
             val = int(acc)
+        elif t == 'IDENT':
+            val = variables[acc]
         else:
             r = stack.pop()
             l = stack.pop()
@@ -27,12 +29,12 @@ def rpn_eval(rpn_tokens):
 if __name__ == '__main__':
     lex = Lexer(terminals)
     text = '''
-    (100 + 14) / 2 + 10
+    a * 13 + b * 100 / 10
     '''
     tokens = lex.tokenize(text)
     rpn_tokens = shunting_yard(tokens)
     accs = [acc for _, acc in rpn_tokens]
-    result = rpn_eval(rpn_tokens)
+    result = rpn_eval(rpn_tokens, {'a': 10, 'b': 20})
     print('Input:', text)
     print('RPN:', ' '.join(accs))
     print()

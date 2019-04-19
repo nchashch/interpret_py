@@ -7,6 +7,19 @@ Regular grammar
 Finite Automata
 '''
 class Parser:
+    def print(self, parsed, indent=0):
+        pad = '  '
+        for p in parsed:
+            if p[0] == 'while_stmt':
+                print(pad*indent, p[0])
+                print(pad*indent, 'condition: {}'.format(p[1][0]))
+                print(pad*indent, 'body: ')
+                while_body = p[1][1]
+                self.print(while_body, indent+1)
+            elif p[0] == 'arith_stmt':
+                print(pad*indent, p)
+    def parse(self, tokens):
+        return self._lang(tokens)
     # lang -> stmt *
     def _lang(self, tokens):
         ast = []
@@ -31,47 +44,50 @@ class Parser:
         #     ast.append(bool_ast)
         #     rest = bool_rest
         if arith_ast:
-            ast += arith_ast
+            ast = arith_ast
             rest = arith_rest
+            label = 'arith_stmt'
         else:
             while_ast, while_rest = self._while(tokens)
             if while_ast:
-                ast += while_ast
+                ast = while_ast
                 rest = while_rest
+                label  = 'while_stmt'
             else:
                 return [], tokens
-        return [('stmt', ast)], rest
+        return [(label, ast)], rest
 
     # arith_stmt -> IDENT ASSIGN arith_expr SEMICOLON
     def _arith_stmt(self, tokens):
-        ast = []
+        lhs = None
+        rhs = None
         # Copy?
         rest = tokens
         IDENT_ast, IDENT_rest = self._terminal('IDENT', rest)
         if IDENT_ast:
-            ast += IDENT_ast
+            lhs = IDENT_ast[0]
             rest = IDENT_rest
         else:
             return [], rest
         ASSIGN_ast, ASSIGN_rest = self._terminal('ASSIGN', rest)
         if ASSIGN_ast:
-            ast += ASSIGN_ast
+            # ast += ASSIGN_ast
             rest = ASSIGN_rest
         else:
             return [], rest
         arith_ast, arith_rest = self._arith_expr(rest)
         if arith_ast:
-            ast += arith_ast
+            rhs = arith_ast
             rest = arith_rest
         else:
             return [], rest
         SEMICOLON_ast, SEMICOLON_rest = self._terminal('SEMICOLON', rest)
         if SEMICOLON_ast:
-            ast += SEMICOLON_ast
+            # ast += SEMICOLON_ast
             rest = SEMICOLON_rest
         else:
             return [], rest
-        return ast, rest
+        return (lhs, rhs), rest
 
     # arith_expr -> NUM | IDENT | arith_expr arith_op arith_expr
     def _arith_expr(self, tokens):
@@ -98,7 +114,7 @@ class Parser:
                 rest = rhs_rest
             else:
                 return [], tokens
-        return [('arith_expr', ast)], rest
+        return ast, rest
 
     # arith_op -> ADD | SUB | MUL | DIV | MOD
     def _arith_op(self, tokens):
@@ -120,29 +136,25 @@ class Parser:
             return None, tokens
     # while -> WHILE bool_expr L_CB while_body R_CB
     def _while(self, tokens):
-        ast = []
         rest = tokens
         while_ast, while_rest = self._terminal('WHILE_KW', rest)
         if while_ast:
-            ast += while_ast
             rest = while_rest
-            bool_ast, bool_rest = self._bool_expr(rest)
-            if bool_ast:
-                ast += bool_ast
-                rest = bool_rest
+            compar_ast, compar_rest = self._compar_expr(rest)
+            if compar_ast:
+                condition = compar_ast
+                rest = compar_rest
                 lcb_ast, lcb_rest = self._terminal('L_CB', rest)
                 if lcb_ast:
-                    ast += lcb_ast
                     rest = lcb_rest
                     body_ast, body_rest = self._while_body(rest)
                     if body_ast:
-                        ast += body_ast
                         rest = body_rest
                         rcb_ast, rcb_rest = self._terminal('R_CB', rest)
                         if rcb_ast:
-                            ast += rcb_ast
+                            # ast += rcb_ast
                             rest = rcb_rest
-                            return ast, rest
+                            return (condition, body_ast), rest
         return [], tokens
     def _while_body(self, tokens):
         return self._lang(tokens)
@@ -174,8 +186,8 @@ class Parser:
             if term_ast:
                 return term_ast, term_rest
         return None, rest
-    def _bool_expr(self, tokens):
-        return self._compar_expr(tokens)
+    # def _bool_expr(self, tokens):
+    #     return self._compar_expr(tokens)
     def _bool_bin_op(self, tokens):
         pass
     def _bool_un_op(self, tokens):
