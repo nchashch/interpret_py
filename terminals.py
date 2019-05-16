@@ -24,6 +24,10 @@ terminals = OrderedDict([
     ('L_P', '^\($'),
     ('R_P', '^\)$'),
 
+    ('L_SB', '^\[$'),
+    ('R_SB', '^\]$'),
+    ('COMMA', '^\,$'),
+
     ('SEMICOLON', '^;$'),
 
     ('PRINT_KW', '^print$'),

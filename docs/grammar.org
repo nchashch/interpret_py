@@ -10,7 +10,7 @@ func = PRINT
 
 expr -> arith_expr | bool_expr
 
-arith_expr -> NUM | IDENT | arith_expr arith_op arith_expr
+arith_expr -> hash_map | NUM | IDENT | arith_expr arith_op arith_expr
 arith_op -> ADD | SUB | MUL | DIV | MOD
 
 compar_expr -> arith_expr arith_expr compar_op
@@ -25,6 +25,12 @@ while_body -> lang
 
 if -> IF bool_expr L_CB if_body L_CB
 if_body -> lang R_CB
+
+list -> L_SB list_content R_SB | L_SB R_SB
+list_content -> arith_expr | arith_expr COMMA list_content
+
+hash_map -> IDENT L_SB arith_expr R_SB
+hash_map_assign_stmt -> hash_map ASSIGN_OP arith_expr SEMICOLON
 
 IF -> if
 WHILE -> while

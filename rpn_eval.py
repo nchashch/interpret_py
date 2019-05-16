@@ -2,7 +2,7 @@ from lexer import Lexer
 from shuntingyard import shunting_yard
 from terminals import terminals
 
-def rpn_eval(rpn_tokens, variables):
+def rpn_eval(rpn_tokens, variables, hash_maps):
     vals = ('NUM', 'IDENT')
     ops = ('ADD', 'SUB', 'MUL', 'DIV', 'MOD')
     stack = []
@@ -12,6 +12,10 @@ def rpn_eval(rpn_tokens, variables):
             val = int(acc)
         elif t == 'IDENT':
             val = variables[acc]
+        elif t == 'HASH_MAP':
+            ident = acc[0]
+            index = acc[1]
+            val = hash_maps[ident][index]
         else:
             r = stack.pop()
             l = stack.pop()
