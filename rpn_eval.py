@@ -14,7 +14,9 @@ def rpn_eval(rpn_tokens, variables, hash_maps):
             val = variables[acc]
         elif t == 'HASH_MAP':
             ident = acc[0]
-            index = acc[1]
+            index_tokens = acc[1]
+            index_tokens = shunting_yard(index_tokens)
+            index = rpn_eval(index_tokens, variables, hash_maps)
             val = hash_maps[ident][index]
         else:
             r = stack.pop()

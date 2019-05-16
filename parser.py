@@ -228,7 +228,7 @@ class Parser:
                         rest = R_SB_rest
 
                         ident = IDENT_ast[0][1]
-                        index = index_ast[0][1]
+                        index = index_ast
 
                         return [('HASH_MAP', (ident, index))], rest
         return [], rest
@@ -236,7 +236,7 @@ class Parser:
 if __name__ == '__main__':
     lex = Lexer(terminals)
     text = '''
-    a[0] = b[0] + 100 * c[12];
+    a[10] = 1 + 123;
     '''
     print(text + '\n')
     tokens = lex.tokenize(text)

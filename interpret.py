@@ -43,30 +43,31 @@ class Interpreter:
                 if lhs[0] == 'IDENT':
                     self.variables[lhs[1]] = result
                 elif lhs[0] == 'HASH_MAP':
-                    ident, index = lhs[1]
+                    ident, index_tokens = lhs[1]
+                    index_tokens = shunting_yard(index_tokens)
+                    index = rpn_eval(index_tokens, self.variables, self.hash_maps)
                     if not self.hash_maps.get(ident):
                         self.hash_maps[ident] = dict()
                     self.hash_maps[ident][index] = result
+
+    def _get_token_value(self, token):
+        if token[0] == 'NUM':
+            return int(token[1])
+        elif token[0] == 'IDENT':
+            return self.variables[token[1]]
+        elif token[0] == 'HASH_MAP':
+            ident, index_tokens = token[1]
+            index_tokens = shunting_yard(index_tokens)
+            index = rpn_eval(index_tokens, self.variables, self.hash_maps)
+            return self.hash_maps[ident][index]
 
     def _check_condition(self, condition):
         lhs_t = condition[0]
         op_t = condition[1]
         op = op_t[0]
         rhs_t = condition[2]
-        if lhs_t[0] == 'NUM':
-            lhs = int(lhs_t[1])
-        elif lhs_t[0] == 'IDENT':
-            lhs = self.variables[lhs_t[1]]
-        elif lhs_t[0] == 'HASH_MAP':
-            ident, index = lhs_t[1]
-            lhs = self.hash_maps[ident][index]
-        if rhs_t[0] == 'NUM':
-            rhs = int(rhs_t[1])
-        elif rhs_t[0] == 'IDENT':
-            rhs = self.variables[rhs_t[1]]
-        elif rhs_t[0] == 'HASH_MAP':
-            ident, index = rhs_t[1]
-            rhs = self.hash_maps[ident][index]
+        lhs = self._get_token_value(lhs_t)
+        rhs = self._get_token_value(rhs_t)
         result = {
             'GT': lhs > rhs,
             'GE': lhs >= rhs,
@@ -76,12 +77,17 @@ class Interpreter:
             'LT': lhs < rhs,
         }
         return result[op]
+
 def main():
     interpreter = Interpreter()
     text = '''
     i[0] = 0;
+    c = 12;
     while  i[0] < 10 {
         i[0] = i[0] + 1;
+        a[12 + 2] = 0;
+        b[c] = i[0];
+        c = i[0] % 3;
     }
     '''
     interpreter.interpret(text)
