@@ -10,7 +10,7 @@ class MismatchedParens:
 def shunting_yard(tokens):
     output = []
     op_stack = []
-    vals = ('NUM', 'IDENT', 'HASH_MAP')
+    vals = ('NUM', 'IDENT', 'HASH_MAP', 'GET')
     ops = ('ADD', 'SUB', 'MUL', 'DIV', 'MOD', 'L_P', 'R_P')
     prec = {
         'ADD': 0,

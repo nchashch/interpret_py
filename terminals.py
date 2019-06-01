@@ -33,6 +33,11 @@ terminals = OrderedDict([
     ('PRINT_KW', '^print$'),
     ('WHILE_KW', '^while$'),
     ('IF_KW', '^if$'),
+    ('LIST_KW', '^list$'),
+    ('PUSH_KW', '^push$'),
+    ('GET_KW', '^get$'),
+    ('DELETE_KW', '^delete$'),
+
     ('NUM', '^0$|^([1-9][0-9]{0,})$'),
     ('IDENT', '^[a-zA-Z]+[a-zA-Z0-9]*$'),
 ])

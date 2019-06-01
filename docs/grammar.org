@@ -26,14 +26,21 @@ while_body -> lang
 if -> IF bool_expr L_CB if_body L_CB
 if_body -> lang R_CB
 
-list -> L_SB list_content R_SB | L_SB R_SB
-list_content -> arith_expr | arith_expr COMMA list_content
+list_stmt -> IDENT ASSIGN LIST L_P R_P SEMICOLON
+push_stmt -> PUSH_KW IDENT L_P arith_expr R_P SEMICOLON
+get_expr -> GET_KW IDENT L_P arith_expr R_P
+delete_stmt -> DELETE_KW IDENT L_P arith_expr R_P SEMICOLON
 
 hash_map -> IDENT L_SB arith_expr R_SB
 hash_map_assign_stmt -> hash_map ASSIGN_OP arith_expr SEMICOLON
 
-IF -> if
-WHILE -> while
+LIST_KW -> list
+PUSH_KW -> push
+GET_KW -> get
+REMOVE_KW -> remove
+
+IF_KW -> if
+WHILE_KW -> while
 L_CB -> {
 R_CB -> }
 ASSIGN -> =

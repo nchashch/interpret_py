@@ -2,8 +2,8 @@ from lexer import Lexer
 from shuntingyard import shunting_yard
 from terminals import terminals
 
-def rpn_eval(rpn_tokens, variables, hash_maps):
-    vals = ('NUM', 'IDENT')
+def rpn_eval(rpn_tokens, variables, hash_maps, lists):
+    vals = ('NUM', 'IDENT', 'HASH_MAP', 'GET')
     ops = ('ADD', 'SUB', 'MUL', 'DIV', 'MOD')
     stack = []
     for terminal, acc in rpn_tokens:
@@ -16,8 +16,14 @@ def rpn_eval(rpn_tokens, variables, hash_maps):
             ident = acc[0]
             index_tokens = acc[1]
             index_tokens = shunting_yard(index_tokens)
-            index = rpn_eval(index_tokens, variables, hash_maps)
+            index = rpn_eval(index_tokens, variables, hash_maps, lists)
             val = hash_maps[ident][index]
+        elif t == 'GET':
+            ident = acc[0]
+            index_tokens = acc[1]
+            index_tokens = shunting_yard(index_tokens)
+            index = rpn_eval(index_tokens, variables, hash_maps, lists)
+            val = lists[ident].get(index)
         else:
             r = stack.pop()
             l = stack.pop()

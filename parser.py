@@ -38,11 +38,7 @@ class Parser:
         ast = []
         # Copy?
         rest = tokens
-        # bool_ast, bool_rest = self._bool_stmt(tokens)
         arith_ast, arith_rest = self._arith_stmt(tokens)
-        # if bool_ast:
-        #     ast.append(bool_ast)
-        #     rest = bool_rest
         if arith_ast:
             ast = arith_ast
             rest = arith_rest
@@ -54,7 +50,25 @@ class Parser:
                 rest = while_rest
                 label  = 'while_stmt'
             else:
-                return [], tokens
+                list_ast, list_rest = self._list_stmt(tokens)
+                if list_ast:
+                    ast = list_ast
+                    rest = list_rest
+                    label = 'list_stmt'
+                else:
+                    push_ast, push_rest = self._push_stmt(tokens)
+                    if push_ast:
+                        ast = push_ast
+                        rest = push_rest
+                        label = 'push_stmt'
+                    else:
+                        delete_ast, delete_rest = self._delete_stmt(tokens)
+                        if delete_ast:
+                            ast = delete_ast
+                            rest = delete_rest
+                            label = 'delete_stmt'
+                        else:
+                            return [], tokens
         return [(label, ast)], rest
 
     # arith_stmt -> IDENT ASSIGN arith_expr SEMICOLON
@@ -94,7 +108,7 @@ class Parser:
             return [], rest
         return (lhs, rhs), rest
 
-    # arith_expr -> NUM | IDENT | hash_map | arith_expr arith_op arith_expr
+    # arith_expr -> NUM | IDENT | hash_map | get_expr | arith_expr arith_op arith_expr
     def _arith_expr(self, tokens):
         ast = []
         rest = tokens
@@ -103,17 +117,22 @@ class Parser:
             ast += NUM_ast
             rest = NUM_rest
         else:
-            hash_map_ast, hash_map_rest = self._hash_map(tokens)
-            if hash_map_ast:
-                ast += hash_map_ast
-                rest = hash_map_rest
+            get_expr_ast, get_expr_rest = self._get_expr(tokens)
+            if get_expr_ast:
+                ast += get_expr_ast
+                rest = get_expr_rest
             else:
-                IDENT_ast, IDENT_rest = self._terminal('IDENT', tokens)
-                if IDENT_ast:
-                    ast += IDENT_ast
-                    rest = IDENT_rest
+                hash_map_ast, hash_map_rest = self._hash_map(tokens)
+                if hash_map_ast:
+                    ast += hash_map_ast
+                    rest = hash_map_rest
                 else:
-                    return [], rest
+                    IDENT_ast, IDENT_rest = self._terminal('IDENT', tokens)
+                    if IDENT_ast:
+                        ast += IDENT_ast
+                        rest = IDENT_rest
+                    else:
+                        return [], rest
         op_ast, op_rest = self._arith_op(rest)
         if op_ast:
             ast += op_ast
@@ -232,11 +251,116 @@ class Parser:
 
                         return [('HASH_MAP', (ident, index))], rest
         return [], rest
+    # list_stmt -> IDENT ASSIGN LIST L_P R_P SEMICOLON
+    def _list_stmt(self, tokens):
+        ast = []
+        rest = tokens
+        IDENT_ast, IDENT_rest = self._terminal('IDENT', rest)
+        if IDENT_ast:
+            rest = IDENT_rest
+            ASSIGN_ast, ASSIGN_rest = self._terminal('ASSIGN', rest)
+            if ASSIGN_ast:
+                rest = ASSIGN_rest
+                LIST_KW_ast, LIST_KW_rest = self._terminal('LIST_KW', rest)
+                if LIST_KW_ast:
+                    rest = LIST_KW_rest
+                    L_P_ast, L_P_rest = self._terminal('L_P', rest)
+                    if L_P_ast:
+                        rest = L_P_rest
+                        R_P_ast, R_P_rest = self._terminal('R_P', rest)
+                        if R_P_ast:
+                            rest = R_P_rest
+                            SEMICOLON_ast, SEMICOLON_rest = self._terminal('SEMICOLON', rest)
+                            if SEMICOLON_ast:
+                                rest = SEMICOLON_rest
+                                return ('NEW_LIST', IDENT_ast[0][1]), rest
+        return [], rest
+    # push_stmt -> PUSH_KW  L_P IDENT COMMA arith_expr R_P SEMICOLON
+    def _push_stmt(self, tokens):
+        ast = []
+        rest = tokens
+        PUSH_KW_ast, PUSH_KW_rest = self._terminal('PUSH_KW', rest)
+        if PUSH_KW_ast:
+            rest = PUSH_KW_rest
+            L_P_ast, L_P_rest = self._terminal('L_P', rest)
+            if L_P_ast:
+                rest = L_P_rest
+                IDENT_ast, IDENT_rest = self._terminal('IDENT', rest)
+                if IDENT_ast:
+                    rest = IDENT_rest
+                    COMMA_ast, COMMA_rest = self._terminal('COMMA', rest)
+                    if COMMA_ast:
+                        rest = COMMA_rest
+                        arith_expr_ast, arith_expr_rest = self._arith_expr(rest)
+                        if arith_expr_ast:
+                            rest = arith_expr_rest
+                            R_P_ast, R_P_rest = self._terminal('R_P', rest)
+                            if R_P_ast:
+                                rest = R_P_rest
+                                SEMICOLON_ast, SEMICOLON_rest = self._terminal('SEMICOLON', rest)
+                                if SEMICOLON_ast:
+                                    rest = SEMICOLON_rest
+                                    return ('PUSH', IDENT_ast[0][1], arith_expr_ast), rest
+        return [], rest
+    # get_expr -> GET_KW L_P IDENT COMMA arith_expr R_P
+    def _get_expr(self, tokens):
+        ast = []
+        rest = tokens
+        GET_KW_ast, GET_KW_rest = self._terminal('GET_KW', rest)
+        if GET_KW_ast:
+            rest = GET_KW_rest
+            L_P_ast, L_P_rest = self._terminal('L_P', rest)
+            if L_P_ast:
+                rest = L_P_rest
+                IDENT_ast, IDENT_rest = self._terminal('IDENT', rest)
+                if IDENT_ast:
+                    rest = IDENT_rest
+                    COMMA_ast, COMMA_rest = self._terminal('COMMA', rest)
+                    if COMMA_ast:
+                        rest = COMMA_rest
+                        arith_expr_ast, arith_expr_rest = self._arith_expr(rest)
+                        if arith_expr_ast:
+                            rest = arith_expr_rest
+                            R_P_ast, R_P_rest = self._terminal('R_P', rest)
+                            if R_P_ast:
+                                rest = R_P_rest
+                                return [('GET', (IDENT_ast[0][1], arith_expr_ast))], rest
+        return [], rest
+    # delete_stmt -> DELETE_KW L_P IDENT COMMA arith_expr R_P SEMICOLON
+    def _delete_stmt(self, tokens):
+        ast = []
+        rest = tokens
+        DELETE_KW_ast, DELETE_KW_rest = self._terminal('DELETE_KW', rest)
+        if DELETE_KW_ast:
+            rest = DELETE_KW_rest
+            L_P_ast, L_P_rest = self._terminal('L_P', rest)
+            if L_P_ast:
+                rest = L_P_rest
+                IDENT_ast, IDENT_rest = self._terminal('IDENT', rest)
+                if IDENT_ast:
+                    rest = IDENT_rest
+                    COMMA_ast, COMMA_rest = self._terminal('COMMA', rest)
+                    if COMMA_ast:
+                        rest = COMMA_rest
+                        arith_expr_ast, arith_expr_rest = self._arith_expr(rest)
+                        if arith_expr_ast:
+                            rest = arith_expr_rest
+                            R_P_ast, R_P_rest = self._terminal('R_P', rest)
+                            if R_P_ast:
+                                rest = R_P_rest
+                                SEMICOLON_ast, SEMICOLON_rest = self._terminal('SEMICOLON', rest)
+                                if SEMICOLON_ast:
+                                    rest = SEMICOLON_rest
+                                    return ('DELETE', IDENT_ast[0][1], arith_expr_ast), rest
+        return [], rest
 
 if __name__ == '__main__':
     lex = Lexer(terminals)
     text = '''
-    a[10] = 1 + 123;
+    c = list();
+    push(c, 10+10);
+    delete(c, 10);
+    b = get(c, 0) + 100 - get(c, 100);
     '''
     print(text + '\n')
     tokens = lex.tokenize(text)
